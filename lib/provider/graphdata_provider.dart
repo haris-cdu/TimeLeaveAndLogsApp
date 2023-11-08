@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import '../constants/functions.dart';
 
 class GraphDataProvider extends ChangeNotifier {
-  List<Graph> data = [];
+  List<Graph> graph = [];
+  List<WorkingLog> workingLog = [];
+  List<LeaveLog> leaveLog = [];
 
   void getGraphDetails(pickedDate) async {
     await GraphDetailsRepository().getGraphDetails(
@@ -13,7 +15,9 @@ class GraphDataProvider extends ChangeNotifier {
         pickedDate).then((response) {
       if (response != null && response.statusCode == 200) {
         Welcome welcome = Welcome.fromJson(response.data);
-        data = welcome.data.graph;
+        graph = welcome.data.graph;
+        workingLog = welcome.data.workingLog;
+        leaveLog = welcome.data.leaveLog;
         notifyListeners();
       }
     });

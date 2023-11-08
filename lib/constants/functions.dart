@@ -9,6 +9,11 @@ String formatDatePicker(DateTime dateTime) {
   return formatter.format(dateTime);
 }
 
+String formatWorkLogDate(DateTime dateTime) {
+  DateFormat formatter = DateFormat('EEEE - dd MMM,yyyy');
+  return formatter.format(dateTime);
+}
+
 String formatJSONDate(DateTime dateTime) {
   DateFormat formatter = DateFormat('yyyy-MM-dd');
   return formatter.format(dateTime);

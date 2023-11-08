@@ -58,42 +58,60 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
               ),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                Container(
-                  color: Colors.blue.withOpacity(0.35),
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: SizedBox(
+                height: hp(context, 110),
+                child: Column(
+                  children: [
+                    Container(
+                      color: Colors.blue.withOpacity(0.35),
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
                         children: [
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text("Hours worked",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: dp(context, 15)))),
-                          SizedBox(
-                            width: wp(context, 8),
-                          ),
-                          Column(
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
+                              Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text("Hours worked",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: dp(context, 15)))),
+                              SizedBox(
+                                width: wp(context, 8),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    height: hp(context, 2),
-                                    width: wp(context, 3),
-                                    color: Colors.green,
+                                  Row(
+                                    children: [
+                                      Container(
+                                        height: hp(context, 2),
+                                        width: wp(context, 3),
+                                        color: Colors.green,
+                                      ),
+                                      SizedBox(
+                                        width: wp(context, 1),
+                                      ),
+                                      const Text("Working"),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: wp(context, 1),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        height: hp(context, 2),
+                                        width: wp(context, 3),
+                                        color: Colors.red,
+                                      ),
+                                      SizedBox(
+                                        width: wp(context, 1),
+                                      ),
+                                      const Text("Sick/WeekOff"),
+                                    ],
                                   ),
-                                  const Text("Working"),
                                 ],
                               ),
                               Row(
@@ -101,180 +119,170 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                                   Container(
                                     height: hp(context, 2),
                                     width: wp(context, 3),
-                                    color: Colors.red,
+                                    color: Colors.orange,
                                   ),
                                   SizedBox(
                                     width: wp(context, 1),
                                   ),
-                                  const Text("Sick/WeekOff"),
+                                  const Text("casual"),
                                 ],
                               ),
                             ],
+                          ),
+                          SizedBox(
+                            height: hp(context, 1),
+                          ),
+                          SizedBox(
+                            height: hp(context, 45),
+                            child: isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : BarChart(BarChartData(
+                                    titlesData: const FlTitlesData(
+                                        rightTitles: AxisTitles(),
+                                        topTitles: AxisTitles()),
+                                    borderData: FlBorderData(
+                                        border: const Border(
+                                            top: BorderSide.none,
+                                            right: BorderSide.none,
+                                            left: BorderSide(width: 1),
+                                            bottom: BorderSide(width: 1))),
+                                    groupsSpace: 8,
+                                    barGroups: [
+                                        BarChartGroupData(
+                                            x: provider.graph[6].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[6])),
+                                        BarChartGroupData(
+                                            x: provider.graph[5].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[5])),
+                                        BarChartGroupData(
+                                            x: provider.graph[4].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[4])),
+                                        BarChartGroupData(
+                                            x: provider.graph[3].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[3])),
+                                        BarChartGroupData(
+                                            x: provider.graph[2].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[2])),
+                                        BarChartGroupData(
+                                            x: provider.graph[1].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[1])),
+                                        BarChartGroupData(
+                                            x: provider.graph[0].date.day,
+                                            barRods: getBarChartRodData(
+                                                provider.graph[0])),
+                                      ])),
+                          ),
+                          Text(
+                            "Weekly log",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: dp(context, 15)),
                           ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                height: hp(context, 2),
-                                width: wp(context, 3),
-                                color: Colors.orange,
+                              InkWell(
+                                onTap: () {
+                                  selectedDate = selectedDate
+                                      .subtract(const Duration(days: 7));
+                                  setState(() {});
+                                  provider.getGraphDetails(selectedDate);
+                                },
+                                child: Icon(
+                                  Icons.arrow_circle_left_outlined,
+                                  size: dp(context, 35),
+                                ),
                               ),
                               SizedBox(
-                                width: wp(context, 1),
+                                width: wp(context, 3),
                               ),
-                              const Text("casual"),
+                              Center(
+                                child: isLoading
+                                    ? const Text("")
+                                    : Text(
+                                        "${formatDatePicker(provider.graph[6].date)} to ${formatDatePicker(provider.graph[0].date)}",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: dp(context, 15)),
+                                      ),
+                              ),
+                              SizedBox(
+                                width: wp(context, 3),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  if (selectedDate.isBefore(DateTime.now()
+                                      .subtract(const Duration(days: 1)))) {
+                                    selectedDate = selectedDate
+                                        .add(const Duration(days: 7));
+                                    setState(() {});
+                                    provider.getGraphDetails(selectedDate);
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.arrow_circle_right_outlined,
+                                  size: dp(context, 35),
+                                ),
+                              ),
                             ],
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: hp(context, 1),
-                      ),
-                      SizedBox(
-                        height: hp(context, 45),
-                        child: isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : BarChart(BarChartData(
-                                titlesData: const FlTitlesData(
-                                    rightTitles: AxisTitles(),
-                                    topTitles: AxisTitles()),
-                                borderData: FlBorderData(
-                                    border: const Border(
-                                        top: BorderSide.none,
-                                        right: BorderSide.none,
-                                        left: BorderSide(width: 1),
-                                        bottom: BorderSide(width: 1))),
-                                groupsSpace: 8,
-                                barGroups: [
-                                    BarChartGroupData(
-                                        x: provider.data[6].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[6])),
-                                    BarChartGroupData(
-                                        x: provider.data[5].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[5])),
-                                    BarChartGroupData(
-                                        x: provider.data[4].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[4])),
-                                    BarChartGroupData(
-                                        x: provider.data[3].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[3])),
-                                    BarChartGroupData(
-                                        x: provider.data[2].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[2])),
-                                    BarChartGroupData(
-                                        x: provider.data[1].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[1])),
-                                    BarChartGroupData(
-                                        x: provider.data[0].date.day,
-                                        barRods: getBarChartRodData(
-                                            provider.data[0])),
-                                  ])),
-                      ),
-                      Text(
-                        "Weekly log",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: dp(context, 15)),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    ),
+                    TabBar(
+                      tabs: [
+                        Tab(child: Text("Work Log", style: tabbarStyle)),
+                        Tab(child: Text("Leave Log", style: tabbarStyle)),
+                      ],
+                    ),
+                    SizedBox(height: hp(context, 2)),
+                    SizedBox(
+                      width: wp(context, 60),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              selectedDate = selectedDate
-                                  .subtract(const Duration(days: 7));
-                              setState(() {});
-                              provider.getGraphDetails(selectedDate);
-                            },
-                            child: Icon(
-                              Icons.arrow_circle_left_outlined,
-                              size: dp(context, 35),
-                            ),
-                          ),
-                          SizedBox(
-                            width: wp(context, 3),
-                          ),
-                          Center(
-                            child: isLoading
-                                ? const Text("")
-                                : Text(
-                                    "${formatDatePicker(provider.data[6].date)} to ${formatDatePicker(provider.data[0].date)}",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: dp(context, 15)),
-                                  ),
-                          ),
-                          SizedBox(
-                            width: wp(context, 3),
+                          const Icon(Icons.calendar_month),
+                          Text(
+                            formatDatePicker(selectedDate),
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w500),
                           ),
                           InkWell(
-                            onTap: () {
-                              if (selectedDate.isBefore(DateTime.now()
-                                  .subtract(const Duration(days: 1)))) {
-                                selectedDate =
-                                    selectedDate.add(const Duration(days: 7));
-                                setState(() {});
-                                provider.getGraphDetails(selectedDate);
-                              }
-                            },
-                            child: Icon(
-                              Icons.arrow_circle_right_outlined,
-                              size: dp(context, 35),
-                            ),
-                          ),
+                              onTap: () async {
+                                final DateTime? pickedDate =
+                                    await showDatePicker(
+                                        context: context,
+                                        initialDate: selectedDate,
+                                        firstDate: DateTime.now().subtract(
+                                            const Duration(days: 365)),
+                                        lastDate: DateTime.now());
+
+                                if (pickedDate != null &&
+                                    pickedDate != selectedDate) {
+                                  setState(() {
+                                    selectedDate = pickedDate;
+                                  });
+                                  provider.getGraphDetails(selectedDate);
+                                }
+                              },
+                              child:
+                                  const Icon(Icons.mode_edit_outline_rounded))
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                TabBar(
-                  tabs: [
-                    Tab(child: Text("Work Log", style: tabbarStyle)),
-                    Tab(child: Text("Leave Log", style: tabbarStyle)),
+                    ),
+                    const Expanded(
+                        child: TabBarView(
+                            children: [WorkLogPage(), LeaveLogPage()]))
                   ],
                 ),
-                SizedBox(height: hp(context, 2)),
-                SizedBox(
-                  width: wp(context, 60),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Icon(Icons.calendar_month),
-                      Text(
-                        formatDatePicker(selectedDate),
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
-                      ),
-                      InkWell(
-                          onTap: () async {
-                            final DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                firstDate: DateTime.now()
-                                    .subtract(const Duration(days: 365)),
-                                lastDate: DateTime.now());
-
-                            if (pickedDate != null &&
-                                pickedDate != selectedDate) {
-                              setState(() {
-                                selectedDate = pickedDate;
-                              });
-                              provider.getGraphDetails(selectedDate);
-                            }
-                          },
-                          child: const Icon(Icons.mode_edit_outline_rounded))
-                    ],
-                  ),
-                ),
-                const Expanded(
-                    child:
-                        TabBarView(children: [WorkLogPage(), LeaveLogPage()]))
-              ],
+              ),
             ),
           ),
         ),

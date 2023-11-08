@@ -24,7 +24,7 @@ class Welcome {
 
 class Data {
   List<Graph> graph;
-  List<dynamic> workingLog;
+  List<WorkingLog> workingLog;
   List<LeaveLog> leaveLog;
 
   Data({
@@ -35,7 +35,8 @@ class Data {
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         graph: List<Graph>.from(json["graph"].map((x) => Graph.fromJson(x))),
-        workingLog: List<dynamic>.from(json["working_log"].map((x) => x)),
+        workingLog: List<WorkingLog>.from(
+            json["working_log"].map((x) => WorkingLog.fromJson(x))),
         leaveLog: List<LeaveLog>.from(
             json["leave_log"].map((x) => LeaveLog.fromJson(x))),
       );
@@ -93,6 +94,112 @@ class Log {
   Map<String, dynamic> toJson() => {
         "working_hours": workingHours,
         "leave_hours": leaveHours,
+      };
+}
+
+class WorkingLog {
+  int id;
+  DateTime date;
+  String day;
+  DateTime submitTime;
+  DateTime updateTime;
+  String totalTime;
+  int empId;
+  List<ProjectLog> projectLog;
+
+  WorkingLog({
+    required this.id,
+    required this.date,
+    required this.day,
+    required this.submitTime,
+    required this.updateTime,
+    required this.totalTime,
+    required this.empId,
+    required this.projectLog,
+  });
+
+  factory WorkingLog.fromJson(Map<String, dynamic> json) => WorkingLog(
+        id: json["id"],
+        date: DateTime.parse(json["date"]),
+        day: json["day"],
+        submitTime: DateTime.parse(json["submit_time"]),
+        updateTime: DateTime.parse(json["update_time"]),
+        totalTime: json["total_time"],
+        empId: json["emp_id"],
+        projectLog: List<ProjectLog>.from(
+            json["project_log"].map((x) => ProjectLog.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "date":
+            "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
+        "day": day,
+        "submit_time": submitTime.toIso8601String(),
+        "update_time": updateTime.toIso8601String(),
+        "total_time": totalTime,
+        "emp_id": empId,
+        "project_log": List<dynamic>.from(projectLog.map((x) => x.toJson())),
+      };
+}
+
+class ProjectLog {
+  int projectId;
+  int workingId;
+  String projectName;
+  String totalTimeInProject;
+  List<Task> tasks;
+
+  ProjectLog({
+    required this.projectId,
+    required this.workingId,
+    required this.projectName,
+    required this.totalTimeInProject,
+    required this.tasks,
+  });
+
+  factory ProjectLog.fromJson(Map<String, dynamic> json) => ProjectLog(
+        projectId: json["project_id"],
+        workingId: json["working_id"],
+        projectName: json["project_name"],
+        totalTimeInProject: json["total_time_in_project"],
+        tasks: List<Task>.from(json["tasks"].map((x) => Task.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "project_id": projectId,
+        "working_id": workingId,
+        "project_name": projectName,
+        "total_time_in_project": totalTimeInProject,
+        "tasks": List<dynamic>.from(tasks.map((x) => x.toJson())),
+      };
+}
+
+class Task {
+  int taskId;
+  int projectId;
+  String taskName;
+  String totalTime;
+
+  Task({
+    required this.taskId,
+    required this.projectId,
+    required this.taskName,
+    required this.totalTime,
+  });
+
+  factory Task.fromJson(Map<String, dynamic> json) => Task(
+        taskId: json["task_id"],
+        projectId: json["project_id"],
+        taskName: json["task_name"],
+        totalTime: json["total_time"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "task_id": taskId,
+        "project_id": projectId,
+        "task_name": taskName,
+        "total_time": totalTime,
       };
 }
 
