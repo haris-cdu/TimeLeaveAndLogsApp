@@ -87,8 +87,8 @@ class Log {
   });
 
   factory Log.fromJson(Map<String, dynamic> json) => Log(
-        workingHours: json["working_hours"],
-        leaveHours: json["leave_hours"],
+        workingHours: json["working_hours"] ?? "",
+        leaveHours: json["leave_hours"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {

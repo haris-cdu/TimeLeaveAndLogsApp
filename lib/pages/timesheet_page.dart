@@ -2,6 +2,7 @@ import 'package:employee_timesheet/constants/functions.dart';
 import 'package:employee_timesheet/constants/responsive.dart';
 import 'package:employee_timesheet/constants/styles.dart';
 import 'package:employee_timesheet/data/services/api_service.dart';
+import 'package:employee_timesheet/pages/add_project_form.dart';
 import 'package:employee_timesheet/pages/leavelog_page.dart';
 import 'package:employee_timesheet/pages/worklog_page.dart';
 import 'package:employee_timesheet/provider/graphdata_provider.dart';
@@ -23,7 +24,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
   @override
   void initState() {
     ApiService().setBaseToken(
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4wLjE4MS9teWNvbXBhbnkvcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTY5OTM0MDkzMiwiZXhwIjoxNzMwODk4NTMyLCJuYmYiOjE2OTkzNDA5MzIsImp0aSI6IjlRcGtJMUQ4bW1NaXdEVG8iLCJzdWIiOiIxNiIsInBydiI6ImIyYWViMjkyOGNiMjVkMmYzMTYzMjBmOTc4ODdlOWM4NThlZjc3ODIifQ.rdahSieFNVDhL9usM7tJBpa4SSH6_WoMmU9yr1YB3Jk");
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4wLjE4MS9teWNvbXBhbnkvcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTY5OTUzMDQ0MCwiZXhwIjoxNzMxMDg4MDQwLCJuYmYiOjE2OTk1MzA0NDAsImp0aSI6Ik1qUUUxMmYwNGpCTllvdk4iLCJzdWIiOiIyMSIsInBydiI6ImIyYWViMjkyOGNiMjVkMmYzMTYzMjBmOTc4ODdlOWM4NThlZjc3ODIifQ.nMyFRrVLwCqBlBpD0PJsKqDdgpWU18Sf3lOgIidMnNs");
     final model = Provider.of<GraphDataProvider>(context, listen: false);
     model.getGraphDetails(DateTime.now());
     super.initState();
@@ -46,7 +47,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                 // Navigator.pop(context, true);
               },
             ),
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.deepPurpleAccent,
             title: const Text(
               "TimeSheet",
               style: TextStyle(fontWeight: FontWeight.w500),
@@ -284,6 +285,14 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                 ),
               ),
             ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.deepPurpleAccent,
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const AddProjectForm()));
+            },
+            child: const Icon(Icons.add),
           ),
         ),
       ),
