@@ -28,15 +28,15 @@ class GraphDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> addProjectAndTasks(List<Project> projects) async {
+  Future<int> addProjectAndTasks(
+      DateTime dateTime, List<Project> projects) async {
     List<Map<String, dynamic>> jsonListOfProjects = [];
     for (int i = 0; i < projects.length; i++) {
       jsonListOfProjects.add(projects[i].toJson());
     }
 
     final requestData = {
-      // "date": formatJSONDate(DateTime.now()),
-      "date": "2002-12-12",
+      "date": formatJSONDate(dateTime),
       "projects": json.encode(jsonListOfProjects),
     };
 

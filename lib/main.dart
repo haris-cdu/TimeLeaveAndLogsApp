@@ -1,3 +1,5 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:employee_timesheet/constants/responsive.dart';
 import 'package:employee_timesheet/pages/timesheet_page.dart';
 import 'package:employee_timesheet/provider/graphdata_provider.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,12 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
           useMaterial3: true,
         ),
-        home: const TimeSheetPage());
+        home: AnimatedSplashScreen(
+            duration: 3500,
+            splash: Image.asset("assets/splash_image.jpg",
+                height: hp(context, 50), width: wp(context, 50)),
+            nextScreen: const TimeSheetPage(),
+            splashTransition: SplashTransition.fadeTransition,
+            backgroundColor: Colors.purple.withOpacity(0.4)));
   }
 }

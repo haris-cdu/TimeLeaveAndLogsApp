@@ -138,47 +138,60 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                             child: isLoading
                                 ? const Center(
                                     child: CircularProgressIndicator())
-                                : BarChart(BarChartData(
-                                    titlesData: const FlTitlesData(
-                                        rightTitles: AxisTitles(),
-                                        topTitles: AxisTitles()),
-                                    borderData: FlBorderData(
-                                        border: const Border(
-                                            top: BorderSide.none,
-                                            right: BorderSide.none,
-                                            left: BorderSide(width: 1),
-                                            bottom: BorderSide(width: 1))),
-                                    groupsSpace: 8,
-                                    barGroups: [
-                                        BarChartGroupData(
-                                            x: provider.graph[6].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[6])),
-                                        BarChartGroupData(
-                                            x: provider.graph[5].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[5])),
-                                        BarChartGroupData(
-                                            x: provider.graph[4].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[4])),
-                                        BarChartGroupData(
-                                            x: provider.graph[3].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[3])),
-                                        BarChartGroupData(
-                                            x: provider.graph[2].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[2])),
-                                        BarChartGroupData(
-                                            x: provider.graph[1].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[1])),
-                                        BarChartGroupData(
-                                            x: provider.graph[0].date.day,
-                                            barRods: getBarChartRodData(
-                                                provider.graph[0])),
-                                      ])),
+                                : BarChart(
+                                    swapAnimationCurve: Curves.easeInOut,
+                                    swapAnimationDuration:
+                                        const Duration(milliseconds: 800),
+                                    BarChartData(
+                                        alignment:
+                                            BarChartAlignment.spaceEvenly,
+                                        titlesData: const FlTitlesData(
+                                            rightTitles: AxisTitles(),
+                                            topTitles: AxisTitles()),
+                                        borderData: FlBorderData(
+                                            border: const Border(
+                                                top: BorderSide.none,
+                                                right: BorderSide.none,
+                                                left: BorderSide(width: 1),
+                                                bottom: BorderSide(width: 1))),
+                                        groupsSpace: 8,
+                                        barGroups: [
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[6].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[6])),
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[5].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[5])),
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[4].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[4])),
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[3].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[3])),
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[2].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[2])),
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[1].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[1])),
+                                          BarChartGroupData(
+                                              groupVertically: true,
+                                              x: provider.graph[0].date.day,
+                                              barRods: getBarChartRodData(
+                                                  provider.graph[0])),
+                                        ])),
                           ),
                           Text(
                             "Weekly log",
@@ -220,7 +233,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                               InkWell(
                                 onTap: () {
                                   if (selectedDate.isBefore(DateTime.now()
-                                      .subtract(const Duration(days: 1)))) {
+                                      .subtract(const Duration(days: 7)))) {
                                     selectedDate = selectedDate
                                         .add(const Duration(days: 7));
                                     setState(() {});
@@ -290,7 +303,9 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
             backgroundColor: Colors.deepPurpleAccent,
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const AddProjectForm()));
+                  builder: (context) => AddProjectForm(
+                        date: selectedDate,
+                      )));
             },
             child: const Icon(Icons.add),
           ),
