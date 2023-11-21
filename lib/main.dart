@@ -29,8 +29,9 @@ class MyApp extends StatelessWidget {
             duration: 3500,
             splash: Image.asset("assets/splash_image.jpg",
                 height: hp(context, 50), width: wp(context, 50)),
+            splashIconSize: 200,
             nextScreen: const TimeSheetPage(),
             splashTransition: SplashTransition.fadeTransition,
-            backgroundColor: Colors.purple.withOpacity(0.4)));
+            backgroundColor: Colors.white));
   }
 }

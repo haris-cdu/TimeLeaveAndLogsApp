@@ -67,3 +67,12 @@ List<BarChartRodData> getBarChartRodData(Graph graph) {
     ];
   }
 }
+
+dynamic checkIfLeaveAdded(DateTime dateTime, List<LeaveLog> leaveList) {
+  for (int i = 0; i < leaveList.length; i++) {
+    if (formatJSONDate(dateTime) == formatJSONDate(leaveList[i].date)) {
+      return leaveList[i];
+    }
+  }
+  return null;
+}
