@@ -76,3 +76,13 @@ dynamic checkIfLeaveAdded(DateTime dateTime, List<LeaveLog> leaveList) {
   }
   return null;
 }
+
+dynamic checkIfWorkingLogAdded(
+    DateTime dateTime, List<WorkingLog> workingList) {
+  for (int i = 0; i < workingList.length; i++) {
+    if (formatJSONDate(dateTime) == formatJSONDate(workingList[i].date)) {
+      return workingList[i];
+    }
+  }
+  return null;
+}

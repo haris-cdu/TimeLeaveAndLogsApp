@@ -144,6 +144,54 @@ class AddProjectFormFormState extends State<AddProjectForm> {
   }
 
   Widget addProjectAndTask(GraphDataProvider provider) {
+    if (checkIfWorkingLogAdded(selectedDate, provider.workingLog) != null) {
+      graph_model.WorkingLog workingLog =
+          checkIfWorkingLogAdded(selectedDate, provider.workingLog);
+      return ListView.builder(
+        padding: const EdgeInsets.all(10),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: workingLog.projectLog.length,
+        itemBuilder: (context, index) => Card(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: Colors.black, width: 1)),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  workingLog.projectLog[index].projectName,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: workingLog.projectLog[index].tasks.length,
+                  itemBuilder: (context, i) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "--> Task: ${workingLog.projectLog[index].tasks[i].taskName}",
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500),
+                      ),
+                      Text(
+                        "\t\t\t\t\t Time: ${workingLog.projectLog[index].tasks[i].totalTime}",
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w400),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -380,7 +428,8 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                              title: const Text('Are you sure?'),
+                              title: const Text(
+                                  'Are you sure you want to delete?'),
                               actions: [
                                 TextButton(
                                   onPressed: () {
