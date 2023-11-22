@@ -14,10 +14,10 @@ class AddProjectForm extends StatefulWidget {
   const AddProjectForm({Key? key, required this.date}) : super(key: key);
 
   @override
-  _AddProjectFormFormState createState() => _AddProjectFormFormState();
+  AddProjectFormFormState createState() => AddProjectFormFormState();
 }
 
-class _AddProjectFormFormState extends State<AddProjectForm> {
+class AddProjectFormFormState extends State<AddProjectForm> {
   late DateTime selectedDate;
   List<Project> projects = [];
   final TextEditingController projectNameController = TextEditingController();
@@ -113,6 +113,7 @@ class _AddProjectFormFormState extends State<AddProjectForm> {
                               setState(() {
                                 selectedDate = pickedDate;
                               });
+                              provider.getGraphDetails(selectedDate);
                             }
                           },
                           child: const Icon(Icons.mode_edit_outline_rounded))
@@ -168,6 +169,7 @@ class _AddProjectFormFormState extends State<AddProjectForm> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       addProject();
+                      projectNameController.clear();
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -276,6 +278,7 @@ class _AddProjectFormFormState extends State<AddProjectForm> {
                           selectedDate, projects);
                       provider.setLoading(false);
                       Navigator.of(context).pop();
+                      provider.getGraphDetails(selectedDate);
                       if (status == 1) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -452,6 +455,7 @@ class _AddProjectFormFormState extends State<AddProjectForm> {
                   selectedDate, leaveType, reasonController.text);
               provider.setLoading(false);
               Navigator.of(context).pop();
+              provider.getGraphDetails(selectedDate);
               if (status == 1) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Leave added successfully!")));
