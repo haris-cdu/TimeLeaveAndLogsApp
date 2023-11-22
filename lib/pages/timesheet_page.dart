@@ -47,10 +47,11 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                 // Navigator.pop(context, true);
               },
             ),
-            backgroundColor: Colors.deepPurpleAccent,
+            backgroundColor: Colors.teal,
             title: const Text(
               "TimeSheet",
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style:
+                  TextStyle(fontWeight: FontWeight.w500, color: Colors.black),
             ),
             actions: [
               IconButton(
@@ -300,7 +301,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.deepPurpleAccent,
+            backgroundColor: Colors.teal,
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => AddProjectForm(

@@ -72,7 +72,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                 Navigator.pop(context, true);
               },
             ),
-            backgroundColor: Colors.deepPurpleAccent,
+            backgroundColor: Colors.teal,
             title: const Text(
               "Add Project & Leaves",
               style: TextStyle(fontWeight: FontWeight.w500),
@@ -224,8 +224,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.deepPurpleAccent.withOpacity(0.4)),
+                      backgroundColor: Colors.teal.withOpacity(0.8)),
                   child: const Text(
                     'Add Project',
                     style: TextStyle(color: Colors.black),
@@ -246,7 +245,10 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                     trailing: Wrap(
                       children: <Widget>[
                         IconButton(
-                          icon: const Icon(Icons.delete),
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
                           onPressed: () => removeProject(project),
                         ),
                         const IconButton(
@@ -293,8 +295,9 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                           projectNameController.clear();
                         },
                         style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Colors.deepPurpleAccent.withOpacity(0.4)),
+                            fixedSize: const Size(
+                                double.maxFinite, double.minPositive),
+                            backgroundColor: Colors.teal.withOpacity(0.8)),
                         child: const Text(
                           'Add Task',
                           style: TextStyle(color: Colors.black),
@@ -313,7 +316,10 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                                 fontWeight: FontWeight.w400, fontSize: 16),
                           ),
                           trailing: IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
                             onPressed: () => removeTask(project, task),
                           ),
                         ),
@@ -321,8 +327,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                   ),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.deepPurpleAccent.withOpacity(0.6)),
+                        backgroundColor: Colors.teal.withOpacity(0.8)),
                     onPressed: () async {
                       provider.setLoading(true);
                       int status = await provider.addProjectAndTasks(
@@ -412,8 +417,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
             children: [
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.deepPurpleAccent.withOpacity(0.6)),
+                      backgroundColor: Colors.teal.withOpacity(0.8)),
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -432,7 +436,10 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                       },
                     );
                   },
-                  child: const Text("Edit")),
+                  child: const Text(
+                    "Edit",
+                    style: TextStyle(color: Colors.black),
+                  )),
               SizedBox(
                 width: wp(context, 2),
               ),
@@ -511,7 +518,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
         ),
         ElevatedButton(
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurpleAccent.withOpacity(0.6)),
+                backgroundColor: Colors.teal.withOpacity(0.8)),
             onPressed: () async {
               provider.setLoading(true);
               int status = await provider.addLeaveLogs(
