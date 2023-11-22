@@ -10,27 +10,19 @@ import '../model/add_project_model.dart';
 import 'leave_dialogue.dart';
 
 class AddProjectForm extends StatefulWidget {
-  final DateTime date;
-  const AddProjectForm({Key? key, required this.date}) : super(key: key);
+  const AddProjectForm({Key? key}) : super(key: key);
 
   @override
   AddProjectFormFormState createState() => AddProjectFormFormState();
 }
 
 class AddProjectFormFormState extends State<AddProjectForm> {
-  late DateTime selectedDate;
   List<Project> projects = [];
   final TextEditingController projectNameController = TextEditingController();
   final TextEditingController taskNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   int totalTime = 1;
   String leaveType = "Full day";
-
-  @override
-  void initState() {
-    super.initState();
-    selectedDate = widget.date;
-  }
 
   void addProject() {
     setState(() {
@@ -92,7 +84,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        formatWorkLogDate(selectedDate),
+                        formatWorkLogDate(provider.selectedDate),
                         style: const TextStyle(
                             fontWeight: FontWeight.w500, fontSize: 18),
                       ),
@@ -101,20 +93,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                       ),
                       InkWell(
                           onTap: () async {
-                            final DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                firstDate: DateTime.now()
-                                    .subtract(const Duration(days: 365)),
-                                lastDate: DateTime.now());
-
-                            if (pickedDate != null &&
-                                pickedDate != selectedDate) {
-                              setState(() {
-                                selectedDate = pickedDate;
-                              });
-                              provider.getGraphDetails(selectedDate);
-                            }
+                            provider.selectDate(context);
                           },
                           child: const Icon(Icons.mode_edit_outline_rounded))
                     ],
@@ -144,9 +123,10 @@ class AddProjectFormFormState extends State<AddProjectForm> {
   }
 
   Widget addProjectAndTask(GraphDataProvider provider) {
-    if (checkIfWorkingLogAdded(selectedDate, provider.workingLog) != null) {
+    if (checkIfWorkingLogAdded(provider.selectedDate, provider.workingLog) !=
+        null) {
       graph_model.WorkingLog workingLog =
-          checkIfWorkingLogAdded(selectedDate, provider.workingLog);
+          checkIfWorkingLogAdded(provider.selectedDate, provider.workingLog);
       return ListView.builder(
         padding: const EdgeInsets.all(10),
         physics: const NeverScrollableScrollPhysics(),
@@ -330,11 +310,10 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                         backgroundColor: Colors.teal.withOpacity(0.8)),
                     onPressed: () async {
                       provider.setLoading(true);
-                      int status = await provider.addProjectAndTasks(
-                          selectedDate, projects);
+                      int status = await provider.addProjectAndTasks(projects);
                       provider.setLoading(false);
                       Navigator.of(context).pop();
-                      provider.getGraphDetails(selectedDate);
+                      provider.getGraphDetails();
                       if (status == 1) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -371,9 +350,9 @@ class AddProjectFormFormState extends State<AddProjectForm> {
 
   Widget addLeaveLogs(GraphDataProvider provider) {
     TextEditingController reasonController = TextEditingController();
-    if (checkIfLeaveAdded(selectedDate, provider.leaveLog) != null) {
+    if (checkIfLeaveAdded(provider.selectedDate, provider.leaveLog) != null) {
       graph_model.LeaveLog leave =
-          checkIfLeaveAdded(selectedDate, provider.leaveLog);
+          checkIfLeaveAdded(provider.selectedDate, provider.leaveLog);
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -423,16 +402,12 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                       context: context,
                       builder: (BuildContext context) {
                         return LeaveDialog(
-                          onLeaveTypeChanged: (value) {
-                            setState(() {
-                              leaveType = value;
-                            });
-                          },
-                          dateTime: selectedDate,
-                          leaveId: leave.id,
-                          leaveType: leave.type,
-                          reason: leave.reason,
-                        );
+                            onLeaveTypeChanged: (value) {
+                              setState(() {
+                                leaveType = value;
+                              });
+                            },
+                            leaveId: leave.id);
                       },
                     );
                   },
@@ -455,7 +430,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                                 TextButton(
                                   onPressed: () {
                                     provider.deleteLeave(leave.id);
-                                    provider.getGraphDetails(selectedDate);
+                                    provider.getGraphDetails();
                                     Navigator.of(context).pop();
                                   },
                                   child: const Text('Yes'),
@@ -521,11 +496,11 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                 backgroundColor: Colors.teal.withOpacity(0.8)),
             onPressed: () async {
               provider.setLoading(true);
-              int status = await provider.addLeaveLogs(
-                  selectedDate, leaveType, reasonController.text);
+              int status =
+                  await provider.addLeaveLogs(leaveType, reasonController.text);
               provider.setLoading(false);
               Navigator.of(context).pop();
-              provider.getGraphDetails(selectedDate);
+              provider.getGraphDetails();
               if (status == 1) {
                 ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Leave added successfully!")));

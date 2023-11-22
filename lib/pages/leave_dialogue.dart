@@ -4,19 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class LeaveDialog extends StatefulWidget {
-  final DateTime dateTime;
   final int leaveId;
-  final String leaveType;
-  final String reason;
   final Function(String) onLeaveTypeChanged;
 
   const LeaveDialog(
-      {super.key,
-      required this.dateTime,
-      required this.leaveId,
-      required this.leaveType,
-      required this.reason,
-      required this.onLeaveTypeChanged});
+      {super.key, required this.leaveId, required this.onLeaveTypeChanged});
 
   @override
   _LeaveDialogState createState() => _LeaveDialogState();
@@ -24,6 +16,7 @@ class LeaveDialog extends StatefulWidget {
 
 class _LeaveDialogState extends State<LeaveDialog> {
   String leaveType = "Full day";
+  TextEditingController reasonController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +46,7 @@ class _LeaveDialogState extends State<LeaveDialog> {
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      leaveType = value!;
+                      leaveType = value.toString();
                     });
                     widget.onLeaveTypeChanged(
                         leaveType); // Notify parent about the change
@@ -61,8 +54,9 @@ class _LeaveDialogState extends State<LeaveDialog> {
                 ),
               ],
             ),
-            const TextField(
-              decoration: InputDecoration(labelText: 'Leave reason'),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(labelText: 'Leave reason'),
             ),
           ],
         ),
@@ -70,12 +64,12 @@ class _LeaveDialogState extends State<LeaveDialog> {
           TextButton(
             onPressed: () async {
               provider.setLoading(true);
-              int status = await provider.updateLeave(widget.dateTime,
-                  widget.leaveId, widget.leaveType, widget.reason);
+              int status = await provider.updateLeave(
+                  widget.leaveId, leaveType, reasonController.text);
               provider.setLoading(false);
               Navigator.of(context).pop();
               if (status == 1) {
-                provider.getGraphDetails(widget.dateTime);
+                provider.getGraphDetails();
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text("Leave updated successfully!")));
               } else {

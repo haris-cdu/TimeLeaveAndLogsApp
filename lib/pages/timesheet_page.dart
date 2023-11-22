@@ -18,7 +18,6 @@ class TimeSheetPage extends StatefulWidget {
 }
 
 class _TimeSheetPageState extends State<TimeSheetPage> {
-  DateTime selectedDate = DateTime.now();
   bool isLoading = true;
 
   @override
@@ -26,7 +25,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
     ApiService().setBaseToken(
         "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTkyLjE2OC4wLjE4MS9teWNvbXBhbnkvcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTY5OTUzMDQ0MCwiZXhwIjoxNzMxMDg4MDQwLCJuYmYiOjE2OTk1MzA0NDAsImp0aSI6Ik1qUUUxMmYwNGpCTllvdk4iLCJzdWIiOiIyMSIsInBydiI6ImIyYWViMjkyOGNiMjVkMmYzMTYzMjBmOTc4ODdlOWM4NThlZjc3ODIifQ.nMyFRrVLwCqBlBpD0PJsKqDdgpWU18Sf3lOgIidMnNs");
     final model = Provider.of<GraphDataProvider>(context, listen: false);
-    model.getGraphDetails(DateTime.now());
+    model.getGraphDetails();
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       isLoading = false;
@@ -205,10 +204,8 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  selectedDate = selectedDate
-                                      .subtract(const Duration(days: 7));
-                                  setState(() {});
-                                  provider.getGraphDetails(selectedDate);
+                                  provider.goPrevious7Days();
+                                  provider.getGraphDetails();
                                 },
                                 child: Icon(
                                   Icons.arrow_circle_left_outlined,
@@ -233,13 +230,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  if (selectedDate.isBefore(DateTime.now()
-                                      .subtract(const Duration(days: 7)))) {
-                                    selectedDate = selectedDate
-                                        .add(const Duration(days: 7));
-                                    setState(() {});
-                                    provider.getGraphDetails(selectedDate);
-                                  }
+                                  provider.goNext7Days();
                                 },
                                 child: Icon(
                                   Icons.arrow_circle_right_outlined,
@@ -265,27 +256,13 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
                         children: [
                           const Icon(Icons.calendar_month),
                           Text(
-                            formatDatePicker(selectedDate),
+                            formatDatePicker(provider.selectedDate),
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w500),
                           ),
                           InkWell(
-                              onTap: () async {
-                                final DateTime? pickedDate =
-                                    await showDatePicker(
-                                        context: context,
-                                        initialDate: selectedDate,
-                                        firstDate: DateTime.now().subtract(
-                                            const Duration(days: 365)),
-                                        lastDate: DateTime.now());
-
-                                if (pickedDate != null &&
-                                    pickedDate != selectedDate) {
-                                  setState(() {
-                                    selectedDate = pickedDate;
-                                  });
-                                  provider.getGraphDetails(selectedDate);
-                                }
+                              onTap: () {
+                                provider.selectDate(context);
                               },
                               child:
                                   const Icon(Icons.mode_edit_outline_rounded))
@@ -304,9 +281,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
             backgroundColor: Colors.teal,
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => AddProjectForm(
-                        date: selectedDate,
-                      )));
+                  builder: (context) => const AddProjectForm()));
             },
             child: const Icon(Icons.add),
           ),
