@@ -1,3 +1,4 @@
+import 'package:employee_timesheet/constants/responsive.dart';
 import 'package:employee_timesheet/provider/graphdata_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,23 +31,35 @@ class _LeaveDialogState extends State<LeaveDialog> {
       builder: (context, provider, child) => AlertDialog(
         title: const Text('Edit Details'),
         content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            DropdownButton(
-              value: leaveType,
-              items: ["Full day", "Half day", "Early going", "Late coming"]
-                  .map((String items) {
-                return DropdownMenuItem(
-                  value: items,
-                  child: Text(items),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  leaveType = value!;
-                });
-                widget.onLeaveTypeChanged(
-                    leaveType); // Notify parent about the change
-              },
+            Row(
+              children: [
+                const Text(
+                  "Select type: ",
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(
+                  width: wp(context, 2),
+                ),
+                DropdownButton(
+                  value: leaveType,
+                  items: ["Full day", "Half day", "Early going", "Late coming"]
+                      .map((String items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(items),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      leaveType = value!;
+                    });
+                    widget.onLeaveTypeChanged(
+                        leaveType); // Notify parent about the change
+                  },
+                ),
+              ],
             ),
             const TextField(
               decoration: InputDecoration(labelText: 'Leave reason'),

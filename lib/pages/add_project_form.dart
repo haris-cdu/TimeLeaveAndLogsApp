@@ -166,6 +166,9 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
+                const Divider(
+                  color: Colors.black,
+                ),
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
@@ -367,26 +370,37 @@ class AddProjectFormFormState extends State<AddProjectForm> {
       graph_model.LeaveLog leave =
           checkIfLeaveAdded(selectedDate, provider.leaveLog);
       return Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Card(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: const BorderSide(color: Colors.black, width: 1)),
-            child: Padding(
+            child: Container(
               padding: const EdgeInsets.all(8.0),
+              width: wp(context, 70),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Center(
+                    child: Text(
+                      "Leave Card",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  const Divider(
+                    color: Colors.black,
+                  ),
                   Text(
-                    "Leave-type: ${leave.type}",
+                    "Type: ${leave.type}",
                     style: leaveStyle,
                   ),
                   Text(
-                    "Leave-reason: ${leave.reason}",
+                    "Reason: ${leave.reason}",
                     style: leaveStyle,
                   ),
                   Text(
-                    "Leave-time: ${leave.totalTime}",
+                    "Time: ${leave.totalTime}",
                     style: leaveStyle,
                   )
                 ],
