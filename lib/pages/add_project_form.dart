@@ -23,6 +23,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   int totalTime = 1;
   String leaveType = "Full day";
+  int totalHours = 0;
 
   void addProject() {
     setState(() {
@@ -34,7 +35,10 @@ class AddProjectFormFormState extends State<AddProjectForm> {
   void addTask(Project project) {
     setState(() {
       project.tasks.add(Task(
-          taskName: taskNameController.text, totalTime: "$totalTime:00:00"));
+          taskName: taskNameController.text.isEmpty
+              ? "Subtask"
+              : taskNameController.text,
+          totalTime: "$totalTime:00:00"));
       taskNameController.clear();
     });
   }
@@ -62,6 +66,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pop(context, true);
+                resetTotalHours();
               },
             ),
             backgroundColor: Colors.teal,
@@ -175,175 +180,218 @@ class AddProjectFormFormState extends State<AddProjectForm> {
         ),
       );
     }
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Form(
-            key: _formKey,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Please enter a project name";
-                    }
-                    return null;
-                  },
-                  controller: projectNameController,
-                  decoration: const InputDecoration(labelText: 'Project Name'),
-                ),
-                SizedBox(
-                  height: hp(context, 1),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      addProject();
-                      projectNameController.clear();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal.withOpacity(0.8)),
-                  child: const Text(
-                    'Add Project',
-                    style: TextStyle(color: Colors.black),
+    if (checkIfLeaveAdded(provider.selectedDate, provider.leaveLog) != null) {
+      graph_model.LeaveLog leaveLog =
+          checkIfLeaveAdded(provider.selectedDate, provider.leaveLog);
+      if (leaveLog.id != 0 && totalHours == 0) {
+        totalHours = convertFromTime(leaveLog.totalTime);
+      }
+    }
+    return WillPopScope(
+      onWillPop: () async {
+        resetTotalHours();
+        return true;
+      },
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Form(
+              key: _formKey,
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  TextFormField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return "Please enter a project name";
+                      }
+                      return null;
+                    },
+                    controller: projectNameController,
+                    decoration:
+                        const InputDecoration(labelText: 'Project Name'),
                   ),
-                ),
-                for (var project in projects)
-                  ExpansionTile(
-                    title: Text(
-                      project.projectName,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 18),
-                    ),
-                    onExpansionChanged: (expanded) {
-                      if (!expanded) {
-                        projectNameController.text = project.projectName;
+                  SizedBox(
+                    height: hp(context, 1),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        addProject();
+                        projectNameController.clear();
                       }
                     },
-                    trailing: Wrap(
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: () => removeProject(project),
-                        ),
-                        const IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: null,
-                        ),
-                      ],
-                    ),
-                    childrenPadding: const EdgeInsets.symmetric(horizontal: 25),
-                    children: [
-                      TextFormField(
-                        controller: taskNameController,
-                        decoration:
-                            const InputDecoration(labelText: 'Task Name'),
-                      ),
-                      Row(
-                        children: [
-                          const Text(
-                            "Hours worked: ",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
-                          ),
-                          SizedBox(
-                            width: wp(context, 10),
-                          ),
-                          DropdownButton(
-                              value: totalTime,
-                              items:
-                                  [1, 2, 3, 4, 5, 6, 7, 8, 9].map((int items) {
-                                return DropdownMenuItem(
-                                  value: items,
-                                  child: Text("$items"),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                totalTime = value!;
-                                setState(() {});
-                              }),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          addTask(project);
-                          projectNameController.clear();
-                        },
-                        style: ElevatedButton.styleFrom(
-                            fixedSize: const Size(
-                                double.maxFinite, double.minPositive),
-                            backgroundColor: Colors.teal.withOpacity(0.8)),
-                        child: const Text(
-                          'Add Task',
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                      for (var task in project.tasks)
-                        ListTile(
-                          title: Text(
-                            task.taskName,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 18),
-                          ),
-                          subtitle: Text(
-                            "Hours: ${task.totalTime}",
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 16),
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.red,
-                            ),
-                            onPressed: () => removeTask(project, task),
-                          ),
-                        ),
-                    ],
-                  ),
-                ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal.withOpacity(0.8)),
-                    onPressed: () async {
-                      provider.setLoading(true);
-                      int status = await provider.addProjectAndTasks(projects);
-                      provider.setLoading(false);
-                      Navigator.of(context).pop();
-                      provider.getGraphDetails();
-                      if (status == 1) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Project added successfully!")));
-                      } else if (status == 0) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Record already inserted!")));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content:
-                                    Text("Something went wrong! Try again")));
-                      }
-                    },
-                    child: provider.isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
+                    child: const Text(
+                      'Add Project',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  for (var project in projects)
+                    ExpansionTile(
+                      title: Text(
+                        project.projectName,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 18),
+                      ),
+                      onExpansionChanged: (expanded) {
+                        if (!expanded) {
+                          projectNameController.text = project.projectName;
+                        }
+                      },
+                      trailing: Wrap(
+                        children: <Widget>[
+                          IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                int taskHours = 0;
+                                for (int i = 0; i < project.tasks.length; i++) {
+                                  taskHours += convertFromTime(
+                                      project.tasks[i].totalTime);
+                                }
+                                removeProject(project);
+                                totalHours -= taskHours;
+                              }),
+                          const IconButton(
+                            icon: Icon(Icons.add),
+                            onPressed: null,
+                          ),
+                        ],
+                      ),
+                      childrenPadding:
+                          const EdgeInsets.symmetric(horizontal: 25),
+                      children: [
+                        TextFormField(
+                          controller: taskNameController,
+                          decoration:
+                              const InputDecoration(labelText: 'Task Name'),
+                        ),
+                        Row(
+                          children: [
+                            const Text(
+                              "Hours worked: ",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500),
                             ),
-                          )
-                        : Text(
-                            "Save",
-                            style: TextStyle(
-                                color: Colors.black, fontSize: dp(context, 20)),
-                          ))
-              ],
+                            SizedBox(
+                              width: wp(context, 10),
+                            ),
+                            DropdownButton(
+                                value: totalTime,
+                                items:
+                                    [1, 2, 3, 4, 5, 6, 7, 8].map((int items) {
+                                  return DropdownMenuItem(
+                                    value: items,
+                                    child: Text("$items"),
+                                  );
+                                }).toList(),
+                                onChanged: (value) {
+                                  totalTime = value!;
+                                  setState(() {});
+                                }),
+                          ],
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            int tempHours = totalHours + totalTime;
+                            print(tempHours);
+                            if (tempHours <= 8) {
+                              addTask(project);
+                              setState(() {
+                                totalHours += totalTime;
+                              });
+                              projectNameController.clear();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          "Maximum hours are added already!")));
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(
+                                  double.maxFinite, double.minPositive),
+                              backgroundColor: Colors.teal.withOpacity(0.8)),
+                          child: const Text(
+                            'Add Task',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                        for (var task in project.tasks)
+                          ListTile(
+                            title: Text(
+                              task.taskName,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500, fontSize: 18),
+                            ),
+                            subtitle: Text(
+                              "Hours: ${task.totalTime}",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 16),
+                            ),
+                            trailing: IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    totalHours -=
+                                        convertFromTime(task.totalTime);
+                                  });
+                                  removeTask(project, task);
+                                }),
+                          ),
+                      ],
+                    ),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.teal.withOpacity(0.8)),
+                      onPressed: () async {
+                        provider.setLoading(true);
+                        int status =
+                            await provider.addProjectAndTasks(projects);
+                        provider.setLoading(false);
+                        Navigator.of(context).pop();
+                        provider.getGraphDetails();
+                        resetTotalHours();
+                        if (status == 1) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Project added successfully!")));
+                        } else if (status == 0) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Record already inserted!")));
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Something went wrong! Try again")));
+                        }
+                      },
+                      child: provider.isLoading
+                          ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              "Save",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: dp(context, 20)),
+                            ))
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -353,105 +401,108 @@ class AddProjectFormFormState extends State<AddProjectForm> {
     if (checkIfLeaveAdded(provider.selectedDate, provider.leaveLog) != null) {
       graph_model.LeaveLog leave =
           checkIfLeaveAdded(provider.selectedDate, provider.leaveLog);
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Card(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: const BorderSide(color: Colors.black, width: 1)),
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              width: wp(context, 70),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
-                    child: Text(
-                      "Leave Card",
-                      style: TextStyle(fontSize: 18),
+      if (leave.id != 0) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Colors.black, width: 1)),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                width: wp(context, 70),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                      child: Text(
+                        "Leave Card",
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
-                  ),
-                  const Divider(
-                    color: Colors.black,
-                  ),
-                  Text(
-                    "Type: ${leave.type}",
-                    style: leaveStyle,
-                  ),
-                  Text(
-                    "Reason: ${leave.reason}",
-                    style: leaveStyle,
-                  ),
-                  Text(
-                    "Time: ${leave.totalTime}",
-                    style: leaveStyle,
-                  )
-                ],
+                    const Divider(
+                      color: Colors.black,
+                    ),
+                    Text(
+                      "Type: ${leave.type}",
+                      style: leaveStyle,
+                    ),
+                    Text(
+                      "Reason: ${leave.reason}",
+                      style: leaveStyle,
+                    ),
+                    Text(
+                      "Time: ${leave.totalTime}",
+                      style: leaveStyle,
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal.withOpacity(0.8)),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return LeaveDialog(
-                            onLeaveTypeChanged: (value) {
-                              setState(() {
-                                leaveType = value;
-                              });
-                            },
-                            leaveId: leave.id);
-                      },
-                    );
-                  },
-                  child: const Text(
-                    "Edit",
-                    style: TextStyle(color: Colors.black),
-                  )),
-              SizedBox(
-                width: wp(context, 2),
-              ),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: () {
-                    showDialog(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal.withOpacity(0.8)),
+                    onPressed: () {
+                      showDialog(
                         context: context,
-                        builder: (context) => AlertDialog(
-                              title: const Text(
-                                  'Are you sure you want to delete?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    provider.deleteLeave(leave.id);
-                                    provider.getGraphDetails();
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('Yes'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('No'),
-                                ),
-                              ],
-                            ));
-                  },
-                  child: const Text(
-                    "Delete",
-                    style: TextStyle(color: Colors.white),
-                  )),
-            ],
-          )
-        ],
-      );
+                        builder: (BuildContext context) {
+                          return LeaveDialog(
+                              onLeaveTypeChanged: (value) {
+                                setState(() {
+                                  leaveType = value;
+                                });
+                              },
+                              leaveId: leave.id);
+                        },
+                      );
+                    },
+                    child: const Text(
+                      "Edit",
+                      style: TextStyle(color: Colors.black),
+                    )),
+                SizedBox(
+                  width: wp(context, 2),
+                ),
+                ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                                title: const Text(
+                                    'Are you sure you want to delete?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      provider.deleteLeave(leave.id);
+                                      provider.getGraphDetails();
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('Yes'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text('No'),
+                                  ),
+                                ],
+                              ));
+                    },
+                    child: const Text(
+                      "Delete",
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            )
+          ],
+        );
+      }
     }
     return SingleChildScrollView(
         child: Column(
@@ -525,5 +576,11 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                   ))
       ],
     ));
+  }
+
+  void resetTotalHours() {
+    setState(() {
+      totalHours = 0;
+    });
   }
 }

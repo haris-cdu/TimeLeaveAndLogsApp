@@ -24,12 +24,10 @@ int getDateFromDateTime(String dateTime) {
   return date.day;
 }
 
-double convertFromTime(String timeString) {
+int convertFromTime(String timeString) {
   List<String> timeParts = timeString.split(':');
   int hours = int.parse(timeParts[0]);
-  int minutes = int.parse(timeParts[1]);
-  double afterDecimal = minutes / 60.0;
-  return hours + afterDecimal;
+  return hours;
 }
 
 List<BarChartRodData> getBarChartRodData(Graph graph) {
@@ -38,7 +36,7 @@ List<BarChartRodData> getBarChartRodData(Graph graph) {
   } else if (graph.type == "working") {
     return [
       BarChartRodData(
-          toY: convertFromTime(graph.log.workingHours),
+          toY: double.parse(convertFromTime(graph.log.workingHours).toString()),
           fromY: 0,
           width: 15,
           color: Colors.green)
@@ -46,7 +44,7 @@ List<BarChartRodData> getBarChartRodData(Graph graph) {
   } else if (graph.type == "causal") {
     return [
       BarChartRodData(
-          toY: convertFromTime(graph.log.leaveHours),
+          toY: double.parse(convertFromTime(graph.log.leaveHours).toString()),
           fromY: 0,
           width: 15,
           color: Colors.orange)
@@ -54,14 +52,15 @@ List<BarChartRodData> getBarChartRodData(Graph graph) {
   } else {
     return [
       BarChartRodData(
-          toY: convertFromTime(graph.log.workingHours),
+          toY: double.parse(convertFromTime(graph.log.workingHours).toString()),
           fromY: 0,
           width: 15,
           color: Colors.green),
       BarChartRodData(
-          toY: convertFromTime(graph.log.leaveHours) +
-              convertFromTime(graph.log.workingHours),
-          fromY: convertFromTime(graph.log.workingHours),
+          toY: double.parse(convertFromTime(graph.log.leaveHours).toString()) +
+              double.parse(convertFromTime(graph.log.workingHours).toString()),
+          fromY:
+              double.parse(convertFromTime(graph.log.workingHours).toString()),
           width: 15,
           color: Colors.red),
     ];
