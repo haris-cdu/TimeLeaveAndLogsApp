@@ -24,6 +24,9 @@ class GraphDataProvider extends ChangeNotifier {
         .isBefore(DateTime.now().subtract(const Duration(days: 7)))) {
       selectedDate = selectedDate.add(const Duration(days: 7));
       getGraphDetails();
+    } else {
+      selectedDate = DateTime.now();
+      getGraphDetails();
     }
     notifyListeners();
   }
