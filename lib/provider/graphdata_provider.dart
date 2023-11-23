@@ -87,7 +87,9 @@ class GraphDataProvider extends ChangeNotifier {
 
   Future<int> addLeaveLogs(String leaveType, String reason) async {
     int leaveCode = 1;
-    if (leaveType == "Half day") {
+    if (leaveType == "Full day") {
+      leaveCode = 1;
+    } else if (leaveType == "Half day") {
       leaveCode = 2;
     } else if (leaveType == "Early going") {
       leaveCode = 3;
