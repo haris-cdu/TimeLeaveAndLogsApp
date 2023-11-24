@@ -211,6 +211,8 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                       decoration: InputDecoration(
                         labelText: 'Project Name',
                         fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 18.0, horizontal: 15.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(25.0),
                           borderSide: const BorderSide(),
@@ -279,6 +281,8 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                               borderRadius: BorderRadius.circular(25.0),
                               borderSide: const BorderSide(),
                             ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 18.0, horizontal: 15.0),
                           ),
                         ),
                         Row(
@@ -609,6 +613,8 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                     borderRadius: BorderRadius.circular(25.0),
                     borderSide: const BorderSide(),
                   ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 18.0, horizontal: 15.0),
                 ),
               ),
               SizedBox(

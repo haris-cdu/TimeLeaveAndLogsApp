@@ -19,6 +19,7 @@ class TimeSheetPage extends StatefulWidget {
 
 class _TimeSheetPageState extends State<TimeSheetPage> {
   bool isLoading = true;
+  bool isServerDown = false;
 
   @override
   void initState() {
@@ -29,6 +30,12 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
       isLoading = false;
+    });
+    Future.delayed(const Duration(seconds: 4), () {
+      if (model.graph.isEmpty) {
+        isServerDown = true;
+        setState(() {});
+      }
     });
     setState(() {});
   }
@@ -59,10 +66,10 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
               ),
             ],
           ),
-          body: provider.graph.isEmpty
+          body: isServerDown
               ? Center(
                   child: Text(
-                  "Fetching data...Please wait",
+                  "Couldn't able to fetch data!",
                   style: TextStyle(
                       fontSize: dp(context, 20), fontWeight: FontWeight.bold),
                 ))
