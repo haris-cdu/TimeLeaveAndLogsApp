@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         ),
         home: AnimatedSplashScreen(
             duration: 3500,
-            splash: Image.asset("assets/splash_image.jpg",
+            splash: Image.asset("assets/splash_png.png",
                 height: hp(context, 50), width: wp(context, 50)),
             splashIconSize: 200,
             nextScreen: const TimeSheetPage(),

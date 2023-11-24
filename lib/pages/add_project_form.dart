@@ -201,16 +201,21 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                 shrinkWrap: true,
                 children: [
                   TextFormField(
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Please enter a project name";
-                      }
-                      return null;
-                    },
-                    controller: projectNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Project Name'),
-                  ),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Please enter a project name";
+                        }
+                        return null;
+                      },
+                      controller: projectNameController,
+                      decoration: InputDecoration(
+                        labelText: 'Project Name',
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                          borderSide: const BorderSide(),
+                        ),
+                      )),
                   SizedBox(
                     height: hp(context, 1),
                   ),
@@ -267,8 +272,14 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                       children: [
                         TextFormField(
                           controller: taskNameController,
-                          decoration:
-                              const InputDecoration(labelText: 'Task Name'),
+                          decoration: InputDecoration(
+                            labelText: 'Task Name',
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                              borderSide: const BorderSide(),
+                            ),
+                          ),
                         ),
                         Row(
                           children: [
@@ -298,7 +309,6 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                         ElevatedButton(
                           onPressed: () {
                             int tempHours = totalWorkingHours + totalTime;
-                            print(tempHours);
                             if (tempHours <= 8) {
                               addTask(project);
                               setState(() {
@@ -521,7 +531,6 @@ class AddProjectFormFormState extends State<AddProjectForm> {
           totalLeaveHours += convertFromTime(time);
         }
       }
-      print("TotalLeaveHours: $totalLeaveHours");
     }
     return totalLeaveHours <= 6
         ? SingleChildScrollView(
@@ -593,13 +602,21 @@ class AddProjectFormFormState extends State<AddProjectForm> {
               ),
               TextFormField(
                 controller: reasonController,
-                decoration: const InputDecoration(labelText: 'Reason'),
+                decoration: InputDecoration(
+                  labelText: 'Reason',
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.0),
+                    borderSide: const BorderSide(),
+                  ),
+                ),
               ),
               SizedBox(
                 height: hp(context, 1),
               ),
               ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                      fixedSize: const Size.fromWidth(double.maxFinite),
                       backgroundColor: Colors.teal.withOpacity(0.8)),
                   onPressed: () async {
                     provider.setLoading(true);
