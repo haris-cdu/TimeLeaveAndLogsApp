@@ -511,8 +511,8 @@ class AddProjectFormFormState extends State<AddProjectForm> {
       }
     }
     if (checkIfWorkingLogAdded(provider.selectedDate, provider.workingLog) !=
-            null &&
-        totalLeaveHours == 0) {
+        null) {
+      totalLeaveHours = 0;
       graph_model.WorkingLog workingLog =
           checkIfWorkingLogAdded(provider.selectedDate, provider.workingLog);
       for (int i = 0; i < workingLog.projectLog.length; i++) {
@@ -573,12 +573,8 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                           : totalLeaveHours <= 6
                               ? DropdownButton(
                                   value: leaveType,
-                                  items: [
-                                    "Full day",
-                                    "Half day",
-                                    "Early going",
-                                    "Late coming"
-                                  ].map((String items) {
+                                  items: ["Early going", "Late coming"]
+                                      .map((String items) {
                                     return DropdownMenuItem(
                                       value: items,
                                       child: Text(items),
@@ -647,12 +643,6 @@ class AddProjectFormFormState extends State<AddProjectForm> {
   void resetTotalWorkingHours() {
     setState(() {
       totalWorkingHours = 0;
-    });
-  }
-
-  void resetTotalLeaveHours() {
-    setState(() {
-      totalLeaveHours = 0;
     });
   }
 }

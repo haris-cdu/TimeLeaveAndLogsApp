@@ -62,7 +62,7 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
           body: provider.graph.isEmpty
               ? Center(
                   child: Text(
-                  "Couldn't fetch data from server! Please wait till issue is resolved!",
+                  "Fetching data...Please wait",
                   style: TextStyle(
                       fontSize: dp(context, 20), fontWeight: FontWeight.bold),
                 ))
