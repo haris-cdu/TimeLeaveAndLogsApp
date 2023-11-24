@@ -16,15 +16,29 @@ class AddProjectForm extends StatefulWidget {
   AddProjectFormFormState createState() => AddProjectFormFormState();
 }
 
-class AddProjectFormFormState extends State<AddProjectForm> {
+class AddProjectFormFormState extends State<AddProjectForm>
+    with SingleTickerProviderStateMixin {
   List<Project> projects = [];
   final TextEditingController projectNameController = TextEditingController();
   final TextEditingController taskNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late TabController tabController;
   int totalTime = 1;
   String leaveType = "Early going";
   int totalWorkingHours = 0;
   int totalLeaveHours = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
 
   void addProject() {
     setState(() {
@@ -58,69 +72,67 @@ class AddProjectFormFormState extends State<AddProjectForm> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Consumer<GraphDataProvider>(
-        builder: (context, provider, child) => Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-            ),
-            backgroundColor: Colors.teal,
-            title: const Text(
-              "Add Project & Leaves",
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
+    return Consumer<GraphDataProvider>(
+      builder: (context, provider, child) => Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.black)),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        formatWorkLogDate(provider.selectedDate),
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 18),
-                      ),
-                      SizedBox(
-                        width: wp(context, 5),
-                      ),
-                      InkWell(
-                          onTap: () async {
-                            provider.selectDate(context);
-                          },
-                          child: const Icon(Icons.mode_edit_outline_rounded))
-                    ],
-                  ),
-                ),
-                TabBar(
-                  tabs: [
-                    Tab(child: Text("Working Log", style: tabbarStyle)),
-                    Tab(child: Text("Leave Log", style: tabbarStyle)),
+          backgroundColor: Colors.teal,
+          title: const Text(
+            "Add Project & Leaves",
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.black)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      formatWorkLogDate(provider.selectedDate),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 18),
+                    ),
+                    SizedBox(
+                      width: wp(context, 5),
+                    ),
+                    InkWell(
+                        onTap: () async {
+                          provider.selectDate(context);
+                        },
+                        child: const Icon(Icons.mode_edit_outline_rounded))
                   ],
                 ),
-                SizedBox(
-                  height: hp(context, 1),
-                ),
-                Expanded(
-                  child: TabBarView(children: [
-                    addProjectAndTask(provider),
-                    addLeaveLogs(provider)
-                  ]),
-                ),
-              ],
-            ),
+              ),
+              TabBar(
+                controller: tabController,
+                tabs: [
+                  Tab(child: Text("Working Log", style: tabbarStyle)),
+                  Tab(child: Text("Leave Log", style: tabbarStyle)),
+                ],
+              ),
+              SizedBox(
+                height: hp(context, 1),
+              ),
+              Expanded(
+                child: TabBarView(controller: tabController, children: [
+                  addProjectAndTask(provider),
+                  addLeaveLogs(provider)
+                ]),
+              ),
+            ],
           ),
         ),
       ),
@@ -375,7 +387,11 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                           int status =
                               await provider.addProjectAndTasks(projects);
                           provider.setLoading(false);
-                          Navigator.of(context).pop();
+                          if (totalWorkingHours > 6) {
+                            Navigator.of(context).pop();
+                          } else {
+                            tabController.animateTo(1);
+                          }
                           provider.getGraphDetails();
                           resetTotalWorkingHours();
                           if (status == 1) {
@@ -501,6 +517,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                                     onPressed: () {
                                       provider.deleteLeave(leave.id);
                                       provider.getGraphDetails();
+                                      resetTotalWorkingHours();
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('Yes'),
