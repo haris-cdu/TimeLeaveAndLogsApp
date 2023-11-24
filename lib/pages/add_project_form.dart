@@ -22,8 +22,9 @@ class AddProjectFormFormState extends State<AddProjectForm> {
   final TextEditingController taskNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   int totalTime = 1;
-  String leaveType = "Full day";
-  int totalHours = 0;
+  String leaveType = "Early going";
+  int totalWorkingHours = 0;
+  int totalLeaveHours = 0;
 
   void addProject() {
     setState(() {
@@ -66,7 +67,6 @@ class AddProjectFormFormState extends State<AddProjectForm> {
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.pop(context, true);
-                resetTotalHours();
               },
             ),
             backgroundColor: Colors.teal,
@@ -183,13 +183,13 @@ class AddProjectFormFormState extends State<AddProjectForm> {
     if (checkIfLeaveAdded(provider.selectedDate, provider.leaveLog) != null) {
       graph_model.LeaveLog leaveLog =
           checkIfLeaveAdded(provider.selectedDate, provider.leaveLog);
-      if (leaveLog.id != 0 && totalHours == 0) {
-        totalHours = convertFromTime(leaveLog.totalTime);
+      if (leaveLog.id != 0 && totalWorkingHours == 0) {
+        totalWorkingHours = convertFromTime(leaveLog.totalTime);
       }
     }
     return WillPopScope(
       onWillPop: () async {
-        resetTotalHours();
+        resetTotalWorkingHours();
         return true;
       },
       child: SingleChildScrollView(
@@ -254,7 +254,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                                       project.tasks[i].totalTime);
                                 }
                                 removeProject(project);
-                                totalHours -= taskHours;
+                                totalWorkingHours -= taskHours;
                               }),
                           const IconButton(
                             icon: Icon(Icons.add),
@@ -297,12 +297,12 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            int tempHours = totalHours + totalTime;
+                            int tempHours = totalWorkingHours + totalTime;
                             print(tempHours);
                             if (tempHours <= 8) {
                               addTask(project);
                               setState(() {
-                                totalHours += totalTime;
+                                totalWorkingHours += totalTime;
                               });
                               projectNameController.clear();
                             } else {
@@ -340,7 +340,7 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    totalHours -=
+                                    totalWorkingHours -=
                                         convertFromTime(task.totalTime);
                                   });
                                   removeTask(project, task);
@@ -352,27 +352,33 @@ class AddProjectFormFormState extends State<AddProjectForm> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.teal.withOpacity(0.8)),
                       onPressed: () async {
-                        provider.setLoading(true);
-                        int status =
-                            await provider.addProjectAndTasks(projects);
-                        provider.setLoading(false);
-                        Navigator.of(context).pop();
-                        provider.getGraphDetails();
-                        resetTotalHours();
-                        if (status == 1) {
+                        if (projects.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                  content:
-                                      Text("Project added successfully!")));
-                        } else if (status == 0) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Record already inserted!")));
+                                  content: Text("Please add projects first!")));
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text("Something went wrong! Try again")));
+                          provider.setLoading(true);
+                          int status =
+                              await provider.addProjectAndTasks(projects);
+                          provider.setLoading(false);
+                          Navigator.of(context).pop();
+                          provider.getGraphDetails();
+                          resetTotalWorkingHours();
+                          if (status == 1) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text("Project added successfully!")));
+                          } else if (status == 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Record already inserted!")));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Something went wrong! Try again")));
+                          }
                         }
                       },
                       child: provider.isLoading
@@ -504,83 +510,149 @@ class AddProjectFormFormState extends State<AddProjectForm> {
         );
       }
     }
-    return SingleChildScrollView(
-        child: Column(
-      children: [
-        Row(
-          children: [
-            const Text(
-              "Select leave type: ",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            SizedBox(
-              width: wp(context, 5),
-            ),
-            DropdownButton(
-                value: leaveType,
-                items: ["Full day", "Half day", "Early going", "Late coming"]
-                    .map((String items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    leaveType = value!;
-                  });
-                }),
-          ],
-        ),
-        SizedBox(
-          height: hp(context, 1),
-        ),
-        TextFormField(
-          controller: reasonController,
-          decoration: const InputDecoration(labelText: 'Reason'),
-        ),
-        SizedBox(
-          height: hp(context, 1),
-        ),
-        ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal.withOpacity(0.8)),
-            onPressed: () async {
-              provider.setLoading(true);
-              int status =
-                  await provider.addLeaveLogs(leaveType, reasonController.text);
-              provider.setLoading(false);
-              Navigator.of(context).pop();
-              provider.getGraphDetails();
-              if (status == 1) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Leave added successfully!")));
-              } else if (status == 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Leave already inserted!")));
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("Something went wrong! Try again")));
-              }
-            },
-            child: provider.isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                    ),
-                  )
-                : Text(
-                    "Save",
-                    style: TextStyle(
-                        color: Colors.black, fontSize: dp(context, 20)),
-                  ))
-      ],
-    ));
+    if (checkIfWorkingLogAdded(provider.selectedDate, provider.workingLog) !=
+            null &&
+        totalLeaveHours == 0) {
+      graph_model.WorkingLog workingLog =
+          checkIfWorkingLogAdded(provider.selectedDate, provider.workingLog);
+      for (int i = 0; i < workingLog.projectLog.length; i++) {
+        for (int j = 0; j < workingLog.projectLog[i].tasks.length; j++) {
+          String time = workingLog.projectLog[i].tasks[j].totalTime;
+          totalLeaveHours += convertFromTime(time);
+        }
+      }
+      print("TotalLeaveHours: $totalLeaveHours");
+    }
+    return totalLeaveHours <= 6
+        ? SingleChildScrollView(
+            child: Column(
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    "Select leave type: ",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  SizedBox(
+                    width: wp(context, 5),
+                  ),
+                  totalLeaveHours == 0
+                      ? DropdownButton(
+                          value: leaveType,
+                          items: [
+                            "Full day",
+                            "Half day",
+                            "Early going",
+                            "Late coming"
+                          ].map((String items) {
+                            return DropdownMenuItem(
+                              value: items,
+                              child: Text(items),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              leaveType = value!;
+                            });
+                          })
+                      : totalLeaveHours <= 4
+                          ? DropdownButton(
+                              value: leaveType,
+                              items: ["Half day", "Early going", "Late coming"]
+                                  .map((String items) {
+                                return DropdownMenuItem(
+                                  value: items,
+                                  child: Text(items),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  leaveType = value!;
+                                });
+                              })
+                          : totalLeaveHours <= 6
+                              ? DropdownButton(
+                                  value: leaveType,
+                                  items: [
+                                    "Full day",
+                                    "Half day",
+                                    "Early going",
+                                    "Late coming"
+                                  ].map((String items) {
+                                    return DropdownMenuItem(
+                                      value: items,
+                                      child: Text(items),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      leaveType = value!;
+                                    });
+                                  })
+                              : Container()
+                ],
+              ),
+              SizedBox(
+                height: hp(context, 1),
+              ),
+              TextFormField(
+                controller: reasonController,
+                decoration: const InputDecoration(labelText: 'Reason'),
+              ),
+              SizedBox(
+                height: hp(context, 1),
+              ),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal.withOpacity(0.8)),
+                  onPressed: () async {
+                    provider.setLoading(true);
+                    int status = await provider.addLeaveLogs(
+                        leaveType, reasonController.text);
+                    provider.setLoading(false);
+                    Navigator.of(context).pop();
+                    provider.getGraphDetails();
+                    if (status == 1) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Leave added successfully!")));
+                    } else if (status == 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Leave already inserted!")));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Something went wrong! Try again")));
+                    }
+                  },
+                  child: provider.isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          "Save",
+                          style: TextStyle(
+                              color: Colors.black, fontSize: dp(context, 20)),
+                        ))
+            ],
+          ))
+        : Center(
+            child: Text(
+            "Was a fully working day!",
+            style: TextStyle(
+                fontSize: dp(context, 20), fontWeight: FontWeight.bold),
+          ));
   }
 
-  void resetTotalHours() {
+  void resetTotalWorkingHours() {
     setState(() {
-      totalHours = 0;
+      totalWorkingHours = 0;
+    });
+  }
+
+  void resetTotalLeaveHours() {
+    setState(() {
+      totalLeaveHours = 0;
     });
   }
 }

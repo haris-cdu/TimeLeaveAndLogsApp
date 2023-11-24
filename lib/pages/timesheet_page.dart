@@ -59,224 +59,243 @@ class _TimeSheetPageState extends State<TimeSheetPage> {
               ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: SizedBox(
-                height: hp(context, 110),
-                child: Column(
-                  children: [
-                    Container(
-                      color: Colors.blue.withOpacity(0.35),
-                      padding: const EdgeInsets.all(10),
+          body: provider.graph.isEmpty
+              ? Center(
+                  child: Text(
+                  "Couldn't fetch data from server! Please wait till issue is resolved!",
+                  style: TextStyle(
+                      fontSize: dp(context, 20), fontWeight: FontWeight.bold),
+                ))
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: SizedBox(
+                      height: hp(context, 110),
                       child: Column(
                         children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text("Hours worked",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: dp(context, 15)))),
-                              SizedBox(
-                                width: wp(context, 8),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        height: hp(context, 2),
-                                        width: wp(context, 3),
-                                        color: Colors.green,
+                          Container(
+                            color: Colors.blue.withOpacity(0.35),
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text("Hours worked",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: dp(context, 15)))),
+                                    SizedBox(
+                                      width: wp(context, 8),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Container(
+                                              height: hp(context, 2),
+                                              width: wp(context, 3),
+                                              color: Colors.green,
+                                            ),
+                                            SizedBox(
+                                              width: wp(context, 1),
+                                            ),
+                                            const Text("Working"),
+                                          ],
+                                        ),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              height: hp(context, 2),
+                                              width: wp(context, 3),
+                                              color: Colors.red,
+                                            ),
+                                            SizedBox(
+                                              width: wp(context, 1),
+                                            ),
+                                            const Text("Sick/WeekOff"),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          height: hp(context, 2),
+                                          width: wp(context, 3),
+                                          color: Colors.orange,
+                                        ),
+                                        SizedBox(
+                                          width: wp(context, 1),
+                                        ),
+                                        const Text("casual"),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: hp(context, 1),
+                                ),
+                                SizedBox(
+                                  height: hp(context, 45),
+                                  child: isLoading
+                                      ? const Center(
+                                          child: CircularProgressIndicator())
+                                      : BarChart(
+                                          swapAnimationCurve: Curves.easeInOut,
+                                          swapAnimationDuration:
+                                              const Duration(milliseconds: 800),
+                                          BarChartData(
+                                              alignment:
+                                                  BarChartAlignment.spaceEvenly,
+                                              titlesData: const FlTitlesData(
+                                                  rightTitles: AxisTitles(),
+                                                  topTitles: AxisTitles()),
+                                              borderData: FlBorderData(
+                                                  border: const Border(
+                                                      top: BorderSide.none,
+                                                      right: BorderSide.none,
+                                                      left:
+                                                          BorderSide(width: 1),
+                                                      bottom: BorderSide(
+                                                          width: 1))),
+                                              groupsSpace: 8,
+                                              barGroups: [
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[6].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[6])),
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[5].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[5])),
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[4].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[4])),
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[3].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[3])),
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[2].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[2])),
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[1].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[1])),
+                                                BarChartGroupData(
+                                                    groupVertically: true,
+                                                    x: provider
+                                                        .graph[0].date.day,
+                                                    barRods: getBarChartRodData(
+                                                        provider.graph[0])),
+                                              ])),
+                                ),
+                                Text(
+                                  "Weekly log",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: dp(context, 15)),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    InkWell(
+                                      onTap: () {
+                                        provider.goPrevious7Days();
+                                        provider.getGraphDetails();
+                                      },
+                                      child: Icon(
+                                        Icons.arrow_circle_left_outlined,
+                                        size: dp(context, 35),
                                       ),
-                                      SizedBox(
-                                        width: wp(context, 1),
+                                    ),
+                                    SizedBox(
+                                      width: wp(context, 3),
+                                    ),
+                                    Center(
+                                      child: isLoading
+                                          ? const Text("")
+                                          : Text(
+                                              "${formatDatePicker(provider.graph[6].date)} to ${formatDatePicker(provider.graph[0].date)}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: dp(context, 15)),
+                                            ),
+                                    ),
+                                    SizedBox(
+                                      width: wp(context, 3),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        provider.goNext7Days();
+                                      },
+                                      child: Icon(
+                                        Icons.arrow_circle_right_outlined,
+                                        size: dp(context, 35),
                                       ),
-                                      const Text("Working"),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        height: hp(context, 2),
-                                        width: wp(context, 3),
-                                        color: Colors.red,
-                                      ),
-                                      SizedBox(
-                                        width: wp(context, 1),
-                                      ),
-                                      const Text("Sick/WeekOff"),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: hp(context, 2),
-                                    width: wp(context, 3),
-                                    color: Colors.orange,
-                                  ),
-                                  SizedBox(
-                                    width: wp(context, 1),
-                                  ),
-                                  const Text("casual"),
-                                ],
-                              ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          TabBar(
+                            tabs: [
+                              Tab(child: Text("Work Log", style: tabbarStyle)),
+                              Tab(child: Text("Leave Log", style: tabbarStyle)),
                             ],
                           ),
+                          SizedBox(height: hp(context, 2)),
                           SizedBox(
-                            height: hp(context, 1),
-                          ),
-                          SizedBox(
-                            height: hp(context, 45),
-                            child: isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator())
-                                : BarChart(
-                                    swapAnimationCurve: Curves.easeInOut,
-                                    swapAnimationDuration:
-                                        const Duration(milliseconds: 800),
-                                    BarChartData(
-                                        alignment:
-                                            BarChartAlignment.spaceEvenly,
-                                        titlesData: const FlTitlesData(
-                                            rightTitles: AxisTitles(),
-                                            topTitles: AxisTitles()),
-                                        borderData: FlBorderData(
-                                            border: const Border(
-                                                top: BorderSide.none,
-                                                right: BorderSide.none,
-                                                left: BorderSide(width: 1),
-                                                bottom: BorderSide(width: 1))),
-                                        groupsSpace: 8,
-                                        barGroups: [
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[6].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[6])),
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[5].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[5])),
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[4].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[4])),
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[3].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[3])),
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[2].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[2])),
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[1].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[1])),
-                                          BarChartGroupData(
-                                              groupVertically: true,
-                                              x: provider.graph[0].date.day,
-                                              barRods: getBarChartRodData(
-                                                  provider.graph[0])),
-                                        ])),
-                          ),
-                          Text(
-                            "Weekly log",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: dp(context, 15)),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  provider.goPrevious7Days();
-                                  provider.getGraphDetails();
-                                },
-                                child: Icon(
-                                  Icons.arrow_circle_left_outlined,
-                                  size: dp(context, 35),
+                            width: wp(context, 60),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Icon(Icons.calendar_month),
+                                Text(
+                                  formatDatePicker(provider.selectedDate),
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                              ),
-                              SizedBox(
-                                width: wp(context, 3),
-                              ),
-                              Center(
-                                child: isLoading
-                                    ? const Text("")
-                                    : Text(
-                                        "${formatDatePicker(provider.graph[6].date)} to ${formatDatePicker(provider.graph[0].date)}",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: dp(context, 15)),
-                                      ),
-                              ),
-                              SizedBox(
-                                width: wp(context, 3),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  provider.goNext7Days();
-                                },
-                                child: Icon(
-                                  Icons.arrow_circle_right_outlined,
-                                  size: dp(context, 35),
-                                ),
-                              ),
-                            ],
+                                InkWell(
+                                    onTap: () {
+                                      provider.selectDate(context);
+                                    },
+                                    child: const Icon(
+                                        Icons.mode_edit_outline_rounded))
+                              ],
+                            ),
                           ),
+                          const Expanded(
+                              child: TabBarView(
+                                  children: [WorkLogPage(), LeaveLogPage()]))
                         ],
                       ),
                     ),
-                    TabBar(
-                      tabs: [
-                        Tab(child: Text("Work Log", style: tabbarStyle)),
-                        Tab(child: Text("Leave Log", style: tabbarStyle)),
-                      ],
-                    ),
-                    SizedBox(height: hp(context, 2)),
-                    SizedBox(
-                      width: wp(context, 60),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Icon(Icons.calendar_month),
-                          Text(
-                            formatDatePicker(provider.selectedDate),
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w500),
-                          ),
-                          InkWell(
-                              onTap: () {
-                                provider.selectDate(context);
-                              },
-                              child:
-                                  const Icon(Icons.mode_edit_outline_rounded))
-                        ],
-                      ),
-                    ),
-                    const Expanded(
-                        child: TabBarView(
-                            children: [WorkLogPage(), LeaveLogPage()]))
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ),
           floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.teal,
             onPressed: () {
